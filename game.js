@@ -175,8 +175,9 @@ function initGame() {
   bird.y = H * 0.5;
   bird.vy = 0;
   bird.radius = Math.min(W, H) * 0.038;
-  bird.gravity = H * 0.0019;
-  bird.flapForce = -H * 0.016;
+  const ref = Math.min(W, H);
+  bird.gravity   = ref * 0.0022;
+  bird.flapForce = -ref * 0.018;
   bird.rotation = 0;
   bird.invincible = false;
   bird.flickerTimer = 0;
@@ -957,8 +958,9 @@ window.addEventListener('resize', () => {
   if (document.getElementById('game-screen').style.display !== 'none') {
     resize();
     bird.radius = Math.min(W, H) * 0.038;
-    bird.gravity = H * 0.0019;
-    bird.flapForce = -H * 0.016;
+    const ref = Math.min(W, H);
+    bird.gravity   = ref * 0.0022;
+    bird.flapForce = -ref * 0.018;
     // Rescale bird x
     bird.x = W * 0.22;
     // Rescale bg stars
