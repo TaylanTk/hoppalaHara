@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hoppala Hara</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- AÇILIŞ EKRANI -->
+  <div id="splash-screen">
+    <div class="stars-bg" id="stars-bg"></div>
+    <div class="nebula"></div>
+
+    <div class="splash-content">
+      <div class="game-logo">
+        <span class="logo-top">HOPPALA</span>
+        <span class="logo-bottom">HARA</span>
+        <div class="logo-glow"></div>
+      </div>
+
+      <p class="choose-text">KARAKTERİNİ SEÇ</p>
+
+      <div class="character-grid">
+        <div class="char-card" id="char-berrak" onclick="selectCharacter('berrak')">
+          <div class="char-halo"></div>
+          <div class="char-img-wrap">
+            <img src="images/berrak.png" alt="Berrak" draggable="false">
+          </div>
+          <div class="char-name">BERRAK</div>
+          <div class="char-stars">★★★★★</div>
+        </div>
+
+        <div class="char-card" id="char-taylan" onclick="selectCharacter('taylan')">
+          <div class="char-halo"></div>
+          <div class="char-img-wrap">
+            <img src="images/taylan.png" alt="Taylan" draggable="false">
+          </div>
+          <div class="char-name">TAYLAN</div>
+          <div class="char-stars">★★★★★</div>
+        </div>
+      </div>
+
+      <p class="choose-text" style="margin-top:4px">ZORLUK SEÇ</p>
+
+      <div class="difficulty-grid">
+        <div class="diff-card" id="diff-kolay" onclick="selectDifficulty('kolay')">
+          <div class="diff-icon">🌱</div>
+          <div class="diff-name">KOLAY</div>
+          <div class="diff-bars"><span class="bar active"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+        </div>
+        <div class="diff-card" id="diff-orta" onclick="selectDifficulty('orta')">
+          <div class="diff-icon">⚡</div>
+          <div class="diff-name">ORTA</div>
+          <div class="diff-bars"><span class="bar active"></span><span class="bar active"></span><span class="bar"></span><span class="bar"></span></div>
+        </div>
+        <div class="diff-card" id="diff-zor" onclick="selectDifficulty('zor')">
+          <div class="diff-icon">🔥</div>
+          <div class="diff-name">ZOR</div>
+          <div class="diff-bars"><span class="bar active"></span><span class="bar active"></span><span class="bar active"></span><span class="bar"></span></div>
+        </div>
+        <div class="diff-card" id="diff-kozmik" onclick="selectDifficulty('kozmik')">
+          <div class="diff-icon">💀</div>
+          <div class="diff-name">KOZMİK</div>
+          <div class="diff-bars"><span class="bar active"></span><span class="bar active"></span><span class="bar active"></span><span class="bar active"></span></div>
+        </div>
+      </div>
+
+      <button class="start-btn" id="start-btn" onclick="startGame()" disabled>
+        <span class="btn-text">HOPLA</span>
+        <div class="btn-shimmer"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- OYUN EKRANI -->
+  <div id="game-screen" style="display:none">
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- HUD -->
+    <div id="hud">
+      <div id="score-display">0</div>
+      <div id="lives-display">
+        <span id="diff-badge"></span>
+      </div>
+    </div>
+
+    <!-- PAUSE OVERLAY -->
+    <div id="pause-overlay" style="display:none">
+      <div class="pause-box">
+        <div class="pause-title">DURAKLADI</div>
+        <button class="pause-btn" onclick="resumeGame()">DEVAM ET</button>
+        <button class="pause-btn secondary" onclick="quitGame()">ÇIKIŞ</button>
+      </div>
+    </div>
+
+    <!-- GAME OVER OVERLAY -->
+    <div id="gameover-overlay" style="display:none">
+      <div class="gameover-box">
+        <div class="go-title">GAME OVER</div>
+        <div class="go-score">SKOR: <span id="final-score">0</span></div>
+        <div class="go-best">EN İYİ: <span id="best-score">0</span></div>
+        <button class="pause-btn" onclick="restartGame()">TEKRAR HOPLA</button>
+        <button class="pause-btn secondary" onclick="quitGame()">ANA MENÜ</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+
+  <!-- LocalStorage Entegrasyonu -->
+  <script>
+    // Sayfa yüklendiğinde en yüksek skoru HUD'a yazdır
+    document.addEventListener("DOMContentLoaded", () => {
+      const bestScoreEl = document.getElementById("best-score");
+      const savedScore = localStorage.getItem("highScore") || 0;
+      bestScoreEl.innerText = savedScore;
+    });
+
+    // Skor güncelleme fonksiyonu
+    function updateScore(currentScore) {
+      const scoreDisplay = document.getElementById("score-display");
+      const bestScoreEl = document.getElementById("best-score");
+
+      // En yüksek skoru al
+      let highScore = localStorage.getItem("highScore") || 0;
+
+      // Eğer mevcut skor yüksekse güncelle
+      if(currentScore > highScore) {
+        localStorage.setItem("highScore", currentScore);
+        highScore = currentScore;
+      }
+
+      // HUD'u güncelle
+      scoreDisplay.innerText = currentScore;
+      bestScoreEl.innerText = highScore;
+    }
+
+    // Game over ekranında skoru göstermek için
+    function showGameOver(finalScore) {
+      const finalScoreEl = document.getElementById("final-score");
+      const bestScoreEl = document.getElementById("best-score");
+
+      finalScoreEl.innerText = finalScore;
+      bestScoreEl.innerText = localStorage.getItem("highScore") || finalScore;
+      document.getElementById("gameover-overlay").style.display = "block";
+    }
+
+    // Örnek: Oyun skor arttığında
+    // updateScore(yourCurrentScore);
+    // Game over olduğunda
+    // showGameOver(yourFinalScore);
+  </script>
+
+</body>
+</html>
