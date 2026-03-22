@@ -175,8 +175,8 @@ function initGame() {
   bird.y = H * 0.5;
   bird.vy = 0;
   bird.radius = Math.min(W, H) * 0.038;
-  bird.gravity = H * 0.0016;
-  bird.flapForce = -H * 0.022;
+  bird.gravity = H * 0.0019;
+  bird.flapForce = -H * 0.016;
   bird.rotation = 0;
   bird.invincible = false;
   bird.flickerTimer = 0;
@@ -206,7 +206,8 @@ function initGame() {
   // Pipes
   pipes = [];
   pipeTimer = 0;
-  pipeInterval = diff.intervalBase;
+  const initVariance = diff.intervalBase * 0.4;
+  pipeInterval = Math.round(diff.intervalBase - initVariance + Math.random() * initVariance * 2);
   pipeSpeed = W * 0.004 * diff.speedMult;
 
   // Score
@@ -349,7 +350,10 @@ function update() {
   if (pipeTimer >= pipeInterval) {
     spawnPipe();
     pipeTimer = 0;
-    pipeInterval = Math.max(bird.diffMin, bird.diffInt - score * bird.diffRamp);
+    // Her boruda yeni rastgele aralık: base ± %40 varyasyon, zorlukla kısalan
+    const base = Math.max(bird.diffMin, bird.diffInt - score * bird.diffRamp);
+    const variance = base * 0.4;
+    pipeInterval = Math.round(base - variance + Math.random() * variance * 2);
   }
 
   // Pipe speed ramp (zorluk bazlı)
@@ -953,8 +957,8 @@ window.addEventListener('resize', () => {
   if (document.getElementById('game-screen').style.display !== 'none') {
     resize();
     bird.radius = Math.min(W, H) * 0.038;
-    bird.gravity = H * 0.0016;
-    bird.flapForce = -H * 0.022;
+    bird.gravity = H * 0.0019;
+    bird.flapForce = -H * 0.016;
     // Rescale bird x
     bird.x = W * 0.22;
     // Rescale bg stars
